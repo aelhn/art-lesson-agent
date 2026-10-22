@@ -1,0 +1,6 @@
+claude-agent-sdk
+fastmcp
+pydantic
+pytest
+pytest-asyncio
+requests

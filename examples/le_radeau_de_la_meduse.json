@@ -1,0 +1,51 @@
+{
+  "title": "Le Radeau de la Méduse",
+  "artist": "Théodore Géricault",
+  "year": "1818-1819",
+  "sections": [
+    {
+      "heading": "Un naufrage bien réel",
+      "text": "Le tableau montre un vrai drame. En juillet 1816, la frégate Méduse, qui partait vers le Sénégal, s'échoue sur un banc de sable à cause d'une erreur de navigation. Environ 149 personnes montent sur un grand radeau construit à la hâte. Les canots qui devaient le tirer l'abandonnent en pleine mer. Après douze ou treize jours de faim, de soif et de folie, seules quinze personnes sont sauvées par le brick Argus.",
+      "source_url": "https://fr.wikipedia.org/wiki/Le_Radeau_de_la_Méduse"
+    },
+    {
+      "heading": "Un peintre qui enquête",
+      "text": "Théodore Géricault, peintre romantique, a 27 ans quand il choisit ce sujet pour sa première grande œuvre. Il veut être au plus près de la vérité. Il rencontre deux survivants et construit une maquette détaillée du radeau. Il va même dans des morgues et des hôpitaux pour observer la couleur de la peau des mourants. Le résultat est immense : environ 5 mètres de haut et 7 mètres de large.",
+      "source_url": "https://fr.wikipedia.org/wiki/Le_Radeau_de_la_Méduse"
+    },
+    {
+      "heading": "Un tableau qui fait scandale",
+      "text": "Présentée au Salon de 1819 à Paris sous le titre « Scène d'un naufrage », l'œuvre divise le public : certains l'adorent, d'autres la critiquent durement. Elle rompt avec le calme et l'ordre de la peinture néo-classique. Exposée ensuite à Londres, elle rend Géricault célèbre en Europe. Elle a inspiré Delacroix, Turner, Courbet et Manet. On peut la voir aujourd'hui au musée du Louvre.",
+      "source_url": "https://fr.wikipedia.org/wiki/Le_Radeau_de_la_Méduse"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "Combien de personnes du radeau ont été retrouvées vivantes par l'Argus ?",
+      "choices": [
+        "Quinze",
+        "Cent quarante-sept",
+        "Quatre cents"
+      ],
+      "answer": "Quinze"
+    },
+    {
+      "question": "Qu'a fait Géricault pour préparer son tableau ?",
+      "choices": [
+        "Il a fait le voyage jusqu'au Sénégal",
+        "Il a rencontré deux survivants et construit une maquette du radeau",
+        "Il a copié un tableau de Delacroix"
+      ],
+      "answer": "Il a rencontré deux survivants et construit une maquette du radeau"
+    },
+    {
+      "question": "Dans quel musée le tableau est-il conservé aujourd'hui ?",
+      "choices": [
+        "Le musée d'Orsay",
+        "La National Gallery de Londres",
+        "Le musée du Louvre"
+      ],
+      "answer": "Le musée du Louvre"
+    }
+  ]
+}

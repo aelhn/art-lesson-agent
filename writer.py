@@ -14,7 +14,7 @@ Règles :
 - 3 questions de quiz avec 3 choix chacune. answer reprend exactement l'un des choix.
 """
 
-async def write_lesson(artwork: str) -> Lesson:
+async def write_lesson(artwork: str, previous: Lesson = None, problems: list[str] = None) -> Lesson: # previous et problems ne sont remplis que pour une correction
     options = ClaudeAgentOptions(
         system_prompt=SYSTEM_PROMPT, 
         mcp_servers={"wikipedia": {"command": sys.executable, "args": ["mcp_server.py"]}}, # Le SDK lance lui-même notre serveur MCP avec le Python du .venv
@@ -27,7 +27,16 @@ async def write_lesson(artwork: str) -> Lesson:
     )
 
     lesson = None
-    async for message in query(prompt=f"Rédige la leçon sur l'oeuvre : {artwork}", options = options): # PS : f"" concatène le texte avec la valeur de la variable
+
+    prompt = f"Rédige la leçon sur l'oeuvre : {artwork}" # En cas de correction, on lui donne la leçon précédente et les remarques du relecteur
+    if previous is not None:
+        prompt += "\n\nVoici ta leçon précédente :\n" + previous.model_dump_json(indent=2)
+        prompt += "\n\nLe relecteur a relevé ces problèmes, corrige-les :\n"
+        for problem in problems:
+            prompt += f"- {problem}\n"
+
+
+    async for message in query(prompt=prompt, options=options): # PS : f"" concatène le texte avec la valeur de la variable
         if isinstance(message, AssistantMessage): # On affiche chaque appel d'outils pour suivre le travail de l'agent
             for block in message.content:
                 if isinstance(block, ToolUseBlock) and block.name != "StructuredOutput": # Bloque l'affichage de StructuredOuput. C'est l'outil interne qui met en forme le json, pas utile de le montrer

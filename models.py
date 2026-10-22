@@ -19,3 +19,7 @@ class Lesson(BaseModel):
     year: str
     sections: list[Section] = Field(min_length=1)   # au moins une section
     quiz: list[QuizQuestion] = Field(min_length=1)
+
+class Review(BaseModel):
+    approved: bool # True seulement si tout est vérifié
+    problems: list[str] # Une phrase par problème, liste vide si tout OK

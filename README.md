@@ -34,8 +34,10 @@ Les deux agents passent par le même serveur MCP, mais avec des droits différen
 | `writer.py` | Agent rédacteur |
 | `reviewer.py` | Agent relecteur |
 | `main.py` | Point d'entrée et boucle rédaction / relecture |
+| `docker_check.py` | client MCP de test pour l’image Docker |
 | `tests/` | Tests pytest, sans réseau ni appel à Claude |
 | `examples/` | Exemple de leçon générée |
+| `Dockerfile` | image du serveur MCP |
 
 ## Installation
 
@@ -88,6 +90,19 @@ Les appels à Wikipédia et aux agents sont remplacés par des faux : les tests 
 - les règles de validation des leçons (une leçon vide ou sans artiste est refusée) ;
 - les outils MCP (construction des liens, texte coupé, page introuvable) ;
 - la boucle de relecture (arrêt si la leçon est validée, renvoi des problèmes au rédacteur, nombre de corrections limité).
+
+## Serveur MCP avec Docker
+
+Le serveur MCP peut être utilisé seul, par n'importe quel client MCP, sans installer Python :
+
+```bash
+docker build -t art-lesson-mcp .
+python docker_check.py
+```
+
+Pour le brancher sur un client (Claude Desktop, Claude Code ou un autre agent), on remplace la commande de lancement par `docker run -i --rm art-lesson-mcp`.
+
+Seul le serveur est conteneurisé. Les agents s'appuient sur une session Claude Code locale, qui ne se transporte pas dans un conteneur. Pour les conteneuriser, il faudrait une clé API ou Amazon Bedrock, que le SDK prend en charge avec une simple variable d'environnement. Je ne l'ai pas fait ici, pour garder un projet personnel sans frais.
 
 ## Choix techniques
 

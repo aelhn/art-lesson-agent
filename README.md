@@ -1,5 +1,7 @@
 # art-lesson-agent
 
+![Tests](https://github.com/aelhn/art-lesson-agent/actions/workflows/tests.yml/badge.svg)
+
 Agent IA qui rédige des leçons d'initiation à l'art à partir de sources Wikipédia.
 
 On lui donne le nom d'une œuvre, il cherche et lit les articles utiles, rédige une courte leçon avec un quiz, puis un second agent vérifie chaque fait avant validation. La leçon est produite en JSON, prête à être affichée par une application éducative.

@@ -36,6 +36,7 @@ Les deux agents passent par le même serveur MCP, mais avec des droits différen
 | `writer.py` | Agent rédacteur |
 | `reviewer.py` | Agent relecteur |
 | `main.py` | Point d'entrée et boucle rédaction / relecture |
+| `api.py` | API REST (FastAPI) : route `POST /lessons` |
 | `docker_check.py` | client MCP de test pour l’image Docker |
 | `tests/` | Tests pytest, sans réseau ni appel à Claude |
 | `examples/` | Exemple de leçon générée |
@@ -77,9 +78,37 @@ Rédaction de la leçon: Le Radeau de la Méduse
     relecteur : mcp__wikipedia__get_article {'title': 'Le Radeau de la Méduse'}
 Leçon validée par le relecteur
 Leçon enregistrée dans output\Le Radeau de la Méduse.json
+Coût : 0.2140 $ | Durée des agents : 84.3 s | Tours : 12
 ```
 
+La dernière ligne donne le coût, la durée et le nombre de tours de toute la boucle, corrections comprises. Avec une session Claude Code, le coût est une estimation au tarif de l'API.
+
 La leçon complète est dans [`examples/le_radeau_de_la_meduse.json`](examples/le_radeau_de_la_meduse.json).
+
+### Avec l'API
+
+```bash
+uvicorn api:app --reload
+```
+
+La commande se lance depuis le dossier du projet. La documentation interactive est sur http://127.0.0.1:8000/docs : elle permet d'essayer la route directement dans le navigateur.
+
+```
+POST /lessons
+{"artwork": "Le Radeau de la Méduse"}
+```
+
+La réponse contient la leçon, le verdict du relecteur et les métriques :
+
+```json
+{
+  "lesson": {"title": "Le Radeau de la Méduse", "artist": "Théodore Géricault", "...": "..."},
+  "review": {"approved": true, "problems": []},
+  "metrics": {"cost_usd": 0.214, "duration_ms": 84300, "num_turns": 12}
+}
+```
+
+Un nom d'œuvre vide ou de plus de 200 caractères est refusé (erreur 422) avant de lancer les agents.
 
 ## Tests
 
@@ -90,8 +119,9 @@ pytest
 Les appels à Wikipédia et aux agents sont remplacés par des faux : les tests sont rapides, gratuits et donnent toujours le même résultat. Ils vérifient :
 
 - les règles de validation des leçons (une leçon vide ou sans artiste est refusée) ;
-- les outils MCP (construction des liens, texte coupé, page introuvable) ;
-- la boucle de relecture (arrêt si la leçon est validée, renvoi des problèmes au rédacteur, nombre de corrections limité).
+- les outils MCP (construction des liens, texte coupé, page introuvable, article piégé qui reste bien encadré) ;
+- la boucle de relecture (arrêt si la leçon est validée, renvoi des problèmes au rédacteur, nombre de corrections limité, total des métriques) ;
+- l'API (réponse complète, nom d'œuvre vide refusé sans lancer les agents).
 
 ## Serveur MCP avec Docker
 
@@ -115,12 +145,16 @@ Seul le serveur est conteneurisé. Les agents s'appuient sur une session Claude 
   - sortie structurée (`output_format`) : les agents doivent remplir un schéma JSON généré à partir des modèles pydantic, qui revérifient ensuite le résultat ;
   - droits minimaux : aucun outil intégré de Claude Code (`tools=[]`), seuls les outils MCP utiles sont autorisés (`allowed_tools`), les réglages et connecteurs de la machine sont ignorés (`setting_sources=[]`, `strict_mcp_config=True`) ;
   - nombre de tours limité (`max_turns`) et nombre de corrections borné, pour éviter qu'un agent tourne en rond.
+- **Une protection contre l'injection de prompt.** Le texte des articles vient d'Internet : c'est une donnée non fiable. `get_article` l'encadre entre des balises `<article_wikipedia>`, et un article qui contient lui-même la balise de fin ne peut pas sortir du cadre. Les prompts des deux agents précisent que ce texte est une donnée, jamais une instruction, et le relecteur traite aussi la leçon reçue comme une donnée. Cette protection réduit le risque sans le supprimer : la vraie limite vient des droits minimaux ci-dessus. Même trompé, un agent ne peut que lire Wikipédia et produire une leçon fausse, qu'une relecture humaine doit attraper.
+- **Un suivi du coût et de la durée.** Le dernier message de chaque appel au SDK donne le coût, la durée et le nombre de tours. `create_lesson` les additionne sur toute la boucle, corrections comprises, et l'API les renvoie avec chaque leçon. On sait ainsi combien coûte une leçon et ce que coûte chaque correction.
+- **Une seule orchestration pour toutes les entrées.** `main.py` et `api.py` appellent la même fonction `create_lesson` : la boucle n'existe qu'à un endroit et ses tests couvrent les deux.
 
 ## Limites
 
 - Les sources se limitent à Wikipédia en français.
 - Le texte d'un article est coupé à 8 000 caractères : un détail situé plus loin dans l'article peut échapper aux agents.
 - Le relecteur est lui-même un LLM : il réduit fortement les erreurs mais ne remplace pas une relecture humaine avant publication.
+- L'API n'a ni authentification ni limite de débit, et la requête reste ouverte pendant tout le travail des agents (une à deux minutes). Pour un usage public, il faudrait une clé par client, un quota, et un traitement en arrière-plan avec un statut consultable.
 
 ## Pistes d'évolution
 

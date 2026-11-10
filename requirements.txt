@@ -1,6 +1,9 @@
 claude-agent-sdk
+fastapi
 fastmcp
+httpx2
 pydantic
 pytest
 pytest-asyncio
 requests
+uvicorn

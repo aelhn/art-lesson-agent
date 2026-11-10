@@ -13,7 +13,7 @@ Règles :
 - approved vaut true seulement si tout est vérifié. Sinon, décris chaque problème dans problems, en une phrase précise.
 """
 
-async def review_lesson(lesson: Lesson) -> Review:
+async def review_lesson(lesson: Lesson) -> tuple[Review, dict]:
     options = ClaudeAgentOptions(
         system_prompt = REVIEW_PROMPT,
         mcp_servers={"wikipedia": {"command": sys.executable, "args": ["mcp_server.py"]}},
@@ -26,6 +26,7 @@ async def review_lesson(lesson: Lesson) -> Review:
     )
 
     review = None
+    metrics = None
     prompt = "Vérifie cette leçon :\n" + lesson.model_dump_json(indent=2)
 
     async for message in query(prompt=prompt, options=options):
@@ -39,4 +40,11 @@ async def review_lesson(lesson: Lesson) -> Review:
                 raise RuntimeError(f"Aucun verdict renvoyé ({message.subtype})")
             review = Review.model_validate(message.structured_output)
 
-    return review
+            # Mêmes métriques que pour le rédacteur
+            metrics = {
+                "cost_usd": message.total_cost_usd or 0,
+                "duration_ms": message.duration_ms,
+                "num_turns": message.num_turns,
+            }
+
+    return review, metrics

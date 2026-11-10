@@ -14,7 +14,7 @@ Règles :
 - 3 questions de quiz avec 3 choix chacune. answer reprend exactement l'un des choix.
 """
 
-async def write_lesson(artwork: str, previous: Lesson = None, problems: list[str] = None) -> Lesson: # previous et problems ne sont remplis que pour une correction
+async def write_lesson(artwork: str, previous: Lesson = None, problems: list[str] = None) -> tuple[Lesson, dict]: # previous et problems ne sont remplis que pour une correction
     options = ClaudeAgentOptions(
         system_prompt=SYSTEM_PROMPT, 
         mcp_servers={"wikipedia": {"command": sys.executable, "args": ["mcp_server.py"]}}, # Le SDK lance lui-même notre serveur MCP avec le Python du .venv
@@ -27,6 +27,7 @@ async def write_lesson(artwork: str, previous: Lesson = None, problems: list[str
     )
 
     lesson = None
+    metrics = None
 
     prompt = f"Rédige la leçon sur l'oeuvre : {artwork}" # En cas de correction, on lui donne la leçon précédente et les remarques du relecteur
     if previous is not None:
@@ -48,5 +49,12 @@ async def write_lesson(artwork: str, previous: Lesson = None, problems: list[str
 
             lesson = Lesson.model_validate(message.structured_output) # Transforme le dictionnaire en objet Lesson (et vérifie au passage qu'il est valide)
 
-    return lesson
+            # Coût, durée et nombre de tours de cet appel, fournis par le SDK dans le dernier message
+            metrics = {
+                "cost_usd": message.total_cost_usd or 0, # None si le SDK ne connaît pas le coût : on compte alors 0
+                "duration_ms": message.duration_ms,
+                "num_turns": message.num_turns,
+            }
+
+    return lesson, metrics
 # --

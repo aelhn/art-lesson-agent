@@ -78,10 +78,10 @@ Rédaction de la leçon: Le Radeau de la Méduse
     relecteur : mcp__wikipedia__get_article {'title': 'Le Radeau de la Méduse'}
 Leçon validée par le relecteur
 Leçon enregistrée dans output\Le Radeau de la Méduse.json
-Coût : 0.2140 $ | Durée des agents : 84.3 s | Tours : 12
+Coût : <coût> $ | Durée des agents : <durée> s | Tours : <tours>
 ```
 
-La dernière ligne donne le coût, la durée et le nombre de tours de toute la boucle, corrections comprises. Avec une session Claude Code, le coût est une estimation au tarif de l'API.
+La dernière ligne donne le coût, la durée et le nombre de tours de toute la boucle, corrections comprises. Les valeurs varient d'une leçon à l'autre. Avec une session Claude Code, le coût est une estimation au tarif de l'API.
 
 La leçon complète est dans [`examples/le_radeau_de_la_meduse.json`](examples/le_radeau_de_la_meduse.json).
 
@@ -100,11 +100,11 @@ POST /lessons
 
 La réponse contient la leçon, le verdict du relecteur et les métriques :
 
-```json
+```
 {
-  "lesson": {"title": "Le Radeau de la Méduse", "artist": "Théodore Géricault", "...": "..."},
+  "lesson": {"title": "Le Radeau de la Méduse", "artist": "Théodore Géricault", ...},
   "review": {"approved": true, "problems": []},
-  "metrics": {"cost_usd": 0.214, "duration_ms": 84300, "num_turns": 12}
+  "metrics": {"cost_usd": <coût>, "duration_ms": <durée>, "num_turns": <tours>}
 }
 ```
 
